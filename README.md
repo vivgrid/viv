@@ -1,6 +1,6 @@
 # viv
 
-AI Agent Toolkit with fast and meaningful streaming
+AI Agent Toolkit with fast and meaningful streaming response
 
 ## Installation
 
@@ -21,7 +21,7 @@ async function main() {
   const stream = await client.chat.completions.stream({
     message: [{ role: 'user', content: 'Say this is a test' }],
   })
-  for wait (const chunk of stream){
+  for await (const chunk of stream){
     console.log(chunk.type, chunk.data)
   }
 }
@@ -37,7 +37,7 @@ This library also provides several conveniences for streaming chat completions, 
 import Viv from 'viv'
 
 const client = new Viv({
-  apiKey: 'API_KEY',
+  apiKey: process.env.API_KEY,
 })
 
 async function main() {
