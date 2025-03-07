@@ -27,7 +27,8 @@ class Viv {
     this.baseURL = options.baseURL || 'https://api.vivgrid.com/v1'
     this.timeout = options.timeout || 1000 * 60 * 10
     this.maxRetries = options.maxRetries || 2
-    this.defaultHeaders = options.defaultHeaders || {
+    this.defaultHeaders = {
+      ...options.defaultHeaders,
       'X-Response-Format': 'vivgrid',
     }
     this.defaultQuery = options.defaultQuery || {}
