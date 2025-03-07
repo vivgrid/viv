@@ -5,13 +5,13 @@ AI Agent Toolkit with fast and meaningful streaming response
 ## Installation
 
 ```bash
-npm install viv
+npm install @yomo/viv
 ```
 
 ## Usage
 
 ```ts
-import Viv from 'viv'
+import Viv from '@yomo/viv'
 
 const client = new Viv({
   apiKey: 'API_KEY',
@@ -34,7 +34,7 @@ main()
 This library also provides several conveniences for streaming chat completions, for example:
 
 ```ts
-import Viv from 'viv'
+import Viv from '@yomo/viv'
 
 const client = new Viv({
   apiKey: process.env.API_KEY,
