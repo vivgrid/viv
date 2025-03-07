@@ -1,7 +1,7 @@
 {
   "name": "viv",
-  "version": "1.0.0",
-  "description": "AI Agent Toolkit with fast and meaningful streaming",
+  "version": "0.0.1",
+  "description": "AI Agent Toolkit with fast and meaningful streaming response",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -13,13 +13,13 @@
     "prettier": "prettier --write \"./src/**/*.+(js|ts|json)\"",
     "prettier:fix": "prettier --write src"
   },
-  "keywords": [],
+  "keywords": ["agent", "llm", "streaming"],
   "files": [
     "dist",
     "README.md",
     "LICENSE"
   ],
-  "author": "Vivgrid <hi@vivgrid.com>",
+  "author": "Jiazong Hou <jiazong.hou@yomo.run>",
   "license": "Apache-2.0",
   "devDependencies": {
     "@eslint/js": "^9.21.0",
