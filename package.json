@@ -1,10 +1,14 @@
 {
   "name": "@yomo/viv",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "AI Agent Toolkit with fast and meaningful streaming response",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
+  "exports": {
+    "import": "./dist/index.mjs",
+    "require": "./dist/index.js"
+  },
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
