@@ -1,4 +1,4 @@
-# Vivgrid Chat Completions Api Response Spec
+# Vivgrid Agent API Response Spec
 
 ## Request Details
 
@@ -11,7 +11,7 @@
 
 ## Response Format
 
-The response is returned in a streaming format. Each chunk is separated by `\n\n` and follows the format `<prefix>: <data>`. The prefixes and their meanings are as follows:
+The response is returned in a streaming format. Each chunk is separated by `\n\n` and follows the format `<prefix>: <data>`. The prefixes and their meanings are described below:
 
 ### Prefix Definitions
 
@@ -27,7 +27,7 @@ The response is returned in a streaming format. Each chunk is separated by `\n\n
 
 - **`c`**: Message content, which are the message chunks from the LLM
 
-- **`g`**: Reasoning content, used to display the reasoning process
+- **`g`**: Reasoning content, which displays the reasoning process
 
 - **`u`**: Token usage, returning a JSON object with these fields:
   - `prompt_tokens`: Number of tokens used in the prompt
@@ -47,13 +47,13 @@ g: "Thinking"
 
 g: "Thinking complete"
 
-f: {"tool_call_id":"call_e6ZVNgqP0pbS0xlm781UbzNe","name":"search_weather","arguments":"{\"city\": \"New York\"}"}
+f: {"tool_call_id":"call_e6ZVNgqP0pbS0xlm781UbzNe","name":"get_weather","arguments":"{\"city\": \"New York\"}"}
 
-f: {"status":"started","tool_call_id":"call_z9AxlKUJe14Po2YehUQETXEA","name":"search_weather","arguments":"{\"city\": \"London\"}"}
+f: {"status":"started","tool_call_id":"call_z9AxlKUJe14Po2YehUQETXEA","name":"get_weather","arguments":"{\"city\": \"London\"}"}
 
-r: {"status":"completed","tool_call_id":"call_e6ZVNgqP0pbS0xlm781UbzNe","name":"search_weather","result":"New York: 25°C"}
+r: {"status":"completed","tool_call_id":"call_e6ZVNgqP0pbS0xlm781UbzNe","name":"get_weather","result":"New York: 25°C"}
 
-r: {"status":"completed","tool_call_id":"call_z9AxlKUJe14Po2YehUQETXEA","name":"search_weather","result":"London: 22°C"}
+r: {"status":"completed","tool_call_id":"call_z9AxlKUJe14Po2YehUQETXEA","name":"get_weather","result":"London: 22°C"}
 
 c: "The"
 
