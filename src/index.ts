@@ -21,6 +21,7 @@ import { ChatResource } from './resources/chat'
 export interface ClientOptions {
   apiKey: string
   baseURL?: string
+  url?: string
   timeout?: number
   maxRetries?: number
   defaultHeaders?: Core.Headers
@@ -29,6 +30,7 @@ export interface ClientOptions {
 class Viv {
   apiKey: string
   baseURL: string
+  url: string
   timeout: number
   maxRetries: number
   defaultHeaders: Core.Headers
@@ -41,6 +43,7 @@ class Viv {
     }
     this.apiKey = options.apiKey
     this.baseURL = options.baseURL || 'https://api.vivgrid.com/v1'
+    this.url = options.url || ''
     this.timeout = options.timeout || 1000 * 60 * 10
     this.maxRetries = options.maxRetries || 2
     this.defaultHeaders = {

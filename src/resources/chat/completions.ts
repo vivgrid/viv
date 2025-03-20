@@ -43,6 +43,7 @@ export class ChatCompletionsResource {
     const apiClient = new APIClient({
       apiKey: this.client.apiKey,
       baseURL: this.client.baseURL,
+      url: this.client.url,
       timeout: this.client.timeout,
       maxRetries: this.client.maxRetries,
       defaultHeaders: this.client.defaultHeaders,

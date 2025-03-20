@@ -32,6 +32,7 @@ export interface RequestOptions {
 export class APIClient {
   private apiKey: string
   private baseURL: string
+  private url: string
   private timeout: number
   private maxRetries: number
   private defaultHeaders: Headers
@@ -40,6 +41,7 @@ export class APIClient {
   constructor({
     apiKey,
     baseURL,
+    url,
     timeout,
     maxRetries,
     defaultHeaders,
@@ -47,6 +49,7 @@ export class APIClient {
   }: {
     apiKey: string
     baseURL: string
+    url: string
     timeout: number
     maxRetries: number
     defaultHeaders: Headers
@@ -54,6 +57,7 @@ export class APIClient {
   }) {
     this.apiKey = apiKey
     this.baseURL = baseURL
+    this.url = url
     this.timeout = timeout
     this.maxRetries = maxRetries
     this.defaultHeaders = defaultHeaders
@@ -69,8 +73,7 @@ export class APIClient {
     timeout = this.timeout,
     signal,
   }: RequestOptions): Promise<ReadableStream> {
-    const url = new URL(path, this.baseURL)
-
+    const url = this.url ? new URL(this.url) : new URL(path, this.baseURL)
     const queryParams = { ...this.defaultQuery, ...query }
     Object.entries(queryParams).forEach(([key, value]) => {
       if (value) {
