@@ -151,6 +151,12 @@ export class VivStream extends EventEmitter {
     const lines = this.buffer.split('\n')
     this.buffer = lines.pop() || ''
 
+    // 检查缓冲区R-Format的消息
+    if (this.buffer.match(/^[frcgups]:/)) {
+      lines.push(this.buffer)
+      this.buffer = ''
+    }
+
     const chunks: Chunk[] = []
     for (const line of lines) {
       if (!line.trim()) continue
@@ -158,42 +164,69 @@ export class VivStream extends EventEmitter {
       if (!match) continue
       const [, matchType, matchData] = match
       let type: ChunkType | undefined
-      let data:
-        | string
-        | FunctionCallChunk
-        | FunctionResultChunk
-        | UsageChunk
-        | undefined
-      try {
-        data = JSON.parse(matchData)
-      } catch (error) {
-        console.error('Error parsing chunk:', error)
-      }
+      let data: string | FunctionCallChunk | FunctionResultChunk | UsageChunk
+
       switch (matchType) {
         case 'f':
           type = 'function_call'
+          try {
+            data = JSON.parse(matchData) as FunctionCallChunk
+            chunks.push({ type, data })
+          } catch (error) {
+            console.error('Error parsing function_call chunk:', error)
+          }
           break
         case 'r':
           type = 'function_call_result'
+          try {
+            data = JSON.parse(matchData) as FunctionResultChunk
+            chunks.push({ type, data })
+          } catch (error) {
+            console.error('Error parsing function_call_result chunk:', error)
+          }
           break
         case 'c':
           type = 'content'
+          try {
+            data = JSON.parse(matchData) as string
+            chunks.push({ type, data })
+          } catch (error) {
+            console.error('Error parsing content chunk:', error)
+          }
           break
         case 'g':
           type = 'reasoning'
+          try {
+            data = JSON.parse(matchData) as string
+            chunks.push({ type, data })
+          } catch (error) {
+            console.error('Error parsing reasoning chunk:', error)
+          }
           break
         case 'u':
           type = 'usage'
+          try {
+            data = JSON.parse(matchData) as UsageChunk
+            chunks.push({ type, data })
+          } catch (error) {
+            console.error('Error parsing usage chunk:', error)
+          }
           break
         case 'p':
           type = 'finish'
+          data = (matchData || '').trim()
+          chunks.push({ type, data })
+
           break
         case 's':
           type = 'system'
+          try {
+            data = JSON.parse(matchData) as string
+            chunks.push({ type, data })
+          } catch (error) {
+            console.error('Error parsing system chunk:', error)
+          }
           break
-      }
-      if (type && data) {
-        chunks.push({ type, data })
       }
     }
     return chunks
