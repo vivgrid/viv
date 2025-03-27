@@ -25,6 +25,7 @@ export type ChunkType =
   | 'usage'
   | 'finish'
   | 'system'
+  | 'error'
 
 export interface FunctionCallChunk {
   status: string
@@ -55,17 +56,24 @@ export interface UsageChunk {
   }
 }
 
+export interface ErrorChunk {
+  code: string
+  message: string
+}
+
 export interface Chunk {
   type: ChunkType
-  data: string | FunctionCallChunk | FunctionResultChunk | UsageChunk
+  data:
+    | string
+    | FunctionCallChunk
+    | FunctionResultChunk
+    | UsageChunk
+    | ErrorChunk
 }
 
 interface VivStreamEvents {
   connect: () => void
-  chunk: (
-    type: ChunkType,
-    data: string | FunctionCallChunk | FunctionResultChunk | UsageChunk,
-  ) => void
+  chunk: (type: ChunkType, data: Chunk['data']) => void
   functionCall: (name: string, args: string, tool_call_id: string) => void
   functionCallResult: (
     name: string,
@@ -152,7 +160,7 @@ export class VivStream extends EventEmitter {
     this.buffer = lines.pop() || ''
 
     // 检查缓冲区R-Format的消息
-    if (this.buffer.match(/^[frcgups]:/)) {
+    if (this.buffer.match(/^[frcgupse]:/)) {
       lines.push(this.buffer)
       this.buffer = ''
     }
@@ -160,12 +168,11 @@ export class VivStream extends EventEmitter {
     const chunks: Chunk[] = []
     for (const line of lines) {
       if (!line.trim()) continue
-      const match = line.match(/^([frcgups]):(.+)$/)
+      const match = line.match(/^([frcgupse]):(.+)$/)
       if (!match) continue
       const [, matchType, matchData] = match
       let type: ChunkType | undefined
-      let data: string | FunctionCallChunk | FunctionResultChunk | UsageChunk
-
+      let data: Chunk['data']
       switch (matchType) {
         case 'f':
           type = 'function_call'
@@ -225,6 +232,15 @@ export class VivStream extends EventEmitter {
             chunks.push({ type, data })
           } catch (error) {
             console.error('Error parsing system chunk:', error)
+          }
+          break
+        case 'e':
+          type = 'error'
+          try {
+            data = JSON.parse(matchData) as ErrorChunk
+            chunks.push({ type, data })
+          } catch (error) {
+            console.error('Error parsing error chunk:', error)
           }
           break
       }
