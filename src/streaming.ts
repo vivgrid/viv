@@ -82,6 +82,7 @@ interface VivStreamEvents {
     ai_note?: string,
   ) => void
   content: (content: string) => void
+  error_chunk: (errorChunk: ErrorChunk) => void
   reasoning: (reasoning: string) => void
   usage: (usage: UsageChunk) => void
   finish: (finish: string) => void
@@ -292,6 +293,11 @@ export class VivStream extends EventEmitter {
         this.emit('system', system)
         break
       }
+      case 'error': {
+        const error = chunk.data as ErrorChunk
+        this.emit('error_chunk', error)
+        break
+      }
     }
   }
   private handleError(error: Error) {
@@ -322,58 +328,45 @@ export class VivStream extends EventEmitter {
   }
 
   // ts config target > es2018
-  [Symbol.asyncIterator](): AsyncIterator<Chunk> {
-    const chunks: Chunk[] = []
-    let done = false
-    let error: Error | null = null
-    let resolvePromise: ((value: IteratorResult<Chunk>) => void) | null = null
-    let rejectPromise: ((err: Error) => void) | null = null
+  async *[Symbol.asyncIterator](): AsyncGenerator<Chunk> {
+    const queue: Chunk[] = []
+    let resolveQueue: (() => void) | null = null
+    let ended = false
 
-    this.on('chunk', (type, data) => {
-      chunks.push({ type, data })
-      if (resolvePromise) {
-        const chunk = chunks.shift()!
-        resolvePromise({ value: chunk, done: false })
-        resolvePromise = null
+    const onChunk = (type: ChunkType, data: Chunk['data']) => {
+      queue.push({ type, data })
+      if (resolveQueue) {
+        resolveQueue()
+        resolveQueue = null
       }
-    })
+    }
 
-    this.on('end', () => {
-      done = true
-      if (resolvePromise) {
-        resolvePromise({ value: undefined, done: true })
-        resolvePromise = null
+    const onEnd = () => {
+      ended = true
+      if (resolveQueue) {
+        resolveQueue()
+        resolveQueue = null
       }
-    })
+    }
 
-    this.on('error', (err) => {
-      error = err
-      if (rejectPromise) {
-        rejectPromise(error)
-        rejectPromise = null
+    this.on('chunk', onChunk)
+    this.once('end', onEnd)
+    this.once('abort', onEnd)
+
+    try {
+      while (!ended || queue.length > 0) {
+        if (queue.length === 0) {
+          await new Promise<void>((resolve) => {
+            resolveQueue = resolve
+          })
+        }
+        while (queue.length > 0) {
+          const chunk = queue.shift()!
+          yield chunk
+        }
       }
-    })
-
-    return {
-      next: (): Promise<IteratorResult<Chunk>> => {
-        if (error) {
-          return Promise.reject(error)
-        }
-
-        if (done && chunks.length === 0) {
-          return Promise.resolve({ value: undefined, done: true })
-        }
-
-        if (chunks.length > 0) {
-          const chunk = chunks.shift()!
-          return Promise.resolve({ value: chunk, done: false })
-        }
-
-        return new Promise<IteratorResult<Chunk>>((resolve, reject) => {
-          resolvePromise = resolve
-          rejectPromise = reject
-        })
-      },
+    } finally {
+      this.off('chunk', onChunk)
     }
   }
 }
