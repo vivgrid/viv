@@ -14,9 +14,27 @@
  * limitations under the License.
  */
 
-export class VivError extends Error {
-  constructor(message: string) {
-    super(message)
-    this.name = 'VivError'
-  }
-}
+// @ts-check
+import tseslint from '@typescript-eslint/eslint-plugin'
+import tsparser from '@typescript-eslint/parser'
+import prettierConfig from 'eslint-config-prettier'
+import prettierPlugin from 'eslint-plugin-prettier'
+
+export default [
+  {
+    files: ['**/*.ts'],
+    languageOptions: {
+      parser: tsparser,
+    },
+    plugins: {
+      '@typescript-eslint': tseslint,
+      prettier: prettierPlugin,
+    },
+    rules: {
+      ...tseslint.configs.recommended.rules,
+      ...prettierConfig.rules,
+      'prettier/prettier': 'error',
+    },
+    ignores: ['dist', 'node_modules'],
+  },
+]
