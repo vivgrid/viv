@@ -1,12 +1,30 @@
+/*
+ * Copyright 2025 Allegro US, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import { EventEmitter } from 'events'
-import type {
-  ChunkType,
-  FunctionCallChunk,
-  FunctionResultChunk,
-  StreamChunkData,
-  StreamEvents,
-  StreamIteratorChunk,
-  TokenUsageChunk,
+import {
+  chunkPrefixToType,
+  type ChunkType,
+  type FunctionCallChunk,
+  type FunctionResultChunk,
+  type RawChunkPrefix,
+  type StreamChunkData,
+  type StreamEvents,
+  type StreamIteratorChunk,
+  type TokenUsageChunk,
 } from './types'
 
 export class Stream
@@ -96,24 +114,28 @@ export class Stream
   }
   processChunk(chunk: string): void {
     if (!chunk.trim()) return
+    const match = chunk.match(/^([frcgup]):(.+)$/)
+    if (!match) return
 
     try {
-      const [prefix, data] = chunk.split(': ')
-      const type = prefix as ChunkType
+      // const [prefix, data] = chunk.split(': ')
+      const [, prefix, data] = match
+      const rawPrefix = prefix as RawChunkPrefix
+      const type = chunkPrefixToType[rawPrefix]
 
-      if (!this.connected && (type === 'c' || type === 'g')) {
+      if (!this.connected && (type === 'content' || type === 'reasoning')) {
         this.connected = true
         this.emit('connect')
       }
 
       switch (type) {
-        case 'f': {
+        case 'functionCall': {
           const functionCall = JSON.parse(data) as FunctionCallChunk
           this.emit('chunk', type, functionCall)
           this.emit('functionCall', functionCall.name, functionCall.arguments)
           break
         }
-        case 'r': {
+        case 'functionCallResult': {
           const functionResult = JSON.parse(data) as FunctionResultChunk
           this.emit('chunk', type, functionResult)
           this.emit(
@@ -123,22 +145,24 @@ export class Stream
           )
           break
         }
-        case 'c': {
-          this.emit('chunk', type, data)
-          this.emit('content', data)
+        case 'content': {
+          const content = JSON.parse(data) as string
+          this.emit('chunk', type, content)
+          this.emit('content', content)
           break
         }
-        case 'g': {
-          this.emit('chunk', type, data)
-          this.emit('reasoning', data)
+        case 'reasoning': {
+          const reasoning = JSON.parse(data) as string
+          this.emit('chunk', type, reasoning)
+          this.emit('reasoning', reasoning)
           break
         }
-        case 'u': {
+        case 'usage': {
           const usage = JSON.parse(data) as TokenUsageChunk
           this.emit('chunk', type, usage)
           break
         }
-        case 'p': {
+        case 'end': {
           if (data === 'finish') {
             this.emit('chunk', type, data)
             this.emit('end')
@@ -146,7 +170,7 @@ export class Stream
           break
         }
         default:
-          this.emit('chunk', type, data)
+          this.emit('chunk', type || 'unknown', data)
       }
     } catch (error) {
       this.emit(

@@ -18,23 +18,7 @@ importers:
         specifier: 5.8.2
         version: 5.8.2
 
-  examples/viv:
-    dependencies:
-      '@yomo/viv':
-        specifier: 0.1.0
-        version: link:../../packages/viv
-    devDependencies:
-      '@types/node':
-        specifier: 22.13.9
-        version: 22.13.9
-      tsx:
-        specifier: 4.19.4
-        version: 4.19.4
-      typescript:
-        specifier: 5.8.2
-        version: 5.8.2
-
-  examples/viv-next:
+  examples/next:
     dependencies:
       '@yomo/viv':
         specifier: 0.1.0
@@ -79,6 +63,46 @@ importers:
       typescript:
         specifier: ^5
         version: 5.8.2
+
+  examples/node:
+    dependencies:
+      '@yomo/viv':
+        specifier: 0.1.0
+        version: link:../../packages/viv
+      dotenv:
+        specifier: ^16.5.0
+        version: 16.5.0
+    devDependencies:
+      '@eslint/js':
+        specifier: ^9.21.0
+        version: 9.27.0
+      '@types/node':
+        specifier: 22.13.9
+        version: 22.13.9
+      '@typescript-eslint/eslint-plugin':
+        specifier: ^8.26.0
+        version: 8.32.0(@typescript-eslint/parser@8.32.0(eslint@9.27.0(jiti@2.4.2))(typescript@5.8.2))(eslint@9.27.0(jiti@2.4.2))(typescript@5.8.2)
+      '@typescript-eslint/parser':
+        specifier: ^8.26.0
+        version: 8.32.0(eslint@9.27.0(jiti@2.4.2))(typescript@5.8.2)
+      eslint:
+        specifier: ^9.21.0
+        version: 9.27.0(jiti@2.4.2)
+      eslint-config-prettier:
+        specifier: ^10.0.2
+        version: 10.1.1(eslint@9.27.0(jiti@2.4.2))
+      eslint-plugin-prettier:
+        specifier: ^5.2.3
+        version: 5.4.0(eslint-config-prettier@10.1.1(eslint@9.27.0(jiti@2.4.2)))(eslint@9.27.0(jiti@2.4.2))(prettier@3.5.3)
+      tsx:
+        specifier: ^4.19.4
+        version: 4.19.4
+      typescript:
+        specifier: 5.8.2
+        version: 5.8.2
+      typescript-eslint:
+        specifier: ^8.26.0
+        version: 8.32.0(eslint@9.27.0(jiti@2.4.2))(typescript@5.8.2)
 
   packages/viv:
     dependencies:
@@ -1199,6 +1223,10 @@ packages:
     resolution: {integrity: sha512-35mSku4ZXK0vfCuHEDAwt55dg2jNajHZ1odvF+8SSr82EsZY4QmXfuWso8oEd8zRhVObSN18aM0CjSdoBX7zIw==}
     engines: {node: '>=0.10.0'}
 
+  dotenv@16.5.0:
+    resolution: {integrity: sha512-m/C+AwOAr9/W1UOIZUo232ejMNnJAJtYQjUbHoNTBNTJSvqzzDh7vnrei3o3r3m9blf6ZoDkvcw0VmozNRFJxg==}
+    engines: {node: '>=12'}
+
   dunder-proto@1.0.1:
     resolution: {integrity: sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A==}
     engines: {node: '>= 0.4'}
@@ -2121,11 +2149,6 @@ packages:
     resolution: {integrity: sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==}
     hasBin: true
 
-  semver@7.7.1:
-    resolution: {integrity: sha512-hlq8tAfn0m/61p4BVRcPzIGr6LKiMwo4VM6dGi6pt4qcRkmNzTcWq6eCEjEh+qXjkMDvPlOFFSGwQjoEa6gyMA==}
-    engines: {node: '>=10'}
-    hasBin: true
-
   semver@7.7.2:
     resolution: {integrity: sha512-RF0Fw+rO5AMf9MAyaRXI4AV0Ulj5lMHqVxxdSgiVbixSCXoEmmX/jk0CuJw4+3SqroYO9VoUh+HcuJivvtJemA==}
     engines: {node: '>=10'}
@@ -3029,7 +3052,7 @@ snapshots:
       fast-glob: 3.3.3
       is-glob: 4.0.3
       minimatch: 9.0.5
-      semver: 7.7.1
+      semver: 7.7.2
       ts-api-utils: 2.1.0(typescript@5.8.2)
       typescript: 5.8.2
     transitivePeerDependencies:
@@ -3351,6 +3374,8 @@ snapshots:
   doctrine@2.1.0:
     dependencies:
       esutils: 2.0.3
+
+  dotenv@16.5.0: {}
 
   dunder-proto@1.0.1:
     dependencies:
@@ -4450,8 +4475,6 @@ snapshots:
   scheduler@0.26.0: {}
 
   semver@6.3.1: {}
-
-  semver@7.7.1: {}
 
   semver@7.7.2: {}
 

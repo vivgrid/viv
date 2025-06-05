@@ -1,0 +1,24 @@
+{
+  "name": "node-example",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "test": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "@yomo/viv": "0.1.0",
+    "dotenv": "^16.5.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.21.0",
+    "@types/node": "22.13.9",
+    "@typescript-eslint/eslint-plugin": "^8.26.0",
+    "@typescript-eslint/parser": "^8.26.0",
+    "eslint": "^9.21.0",
+    "eslint-config-prettier": "^10.0.2",
+    "eslint-plugin-prettier": "^5.2.3",
+    "tsx": "^4.19.4",
+    "typescript": "5.8.2",
+    "typescript-eslint": "^8.26.0"
+  }
+}
