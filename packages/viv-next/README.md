@@ -1,12 +1,23 @@
-# viv next proxy
+## Example
 
 ```ts
-// app/api/vivgrid/route.ts
-import { createProxy } from "@yomo/viv-next"
+// app/api/chat/completions.ts
+import { handleOptions, handleRequest } from '@yomo/viv-next'
+import { NextRequest } from 'next/server'
 
-// Create a proxy handler for Next.js API routes
-export default createProxy({
-  url: "https://api.vivgrid.com/v1/chat/completions",
+export const runtime = 'edge'
+
+export const POST = (req: NextRequest) => handleRequest(req, {
+  baseURL: 'https://api.vivgrid.com/v1',
+  method: 'POST',
 })
+export const OPTIONS = () => handleOptions()
+```
 
+```ts
+// client
+new Viv({
+  apiKey: process.env.NEXT_PUBLIC_VIV_API_KEY!,
+  baseURL: '/api'
+})
 ```
