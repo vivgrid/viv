@@ -14,9 +14,5 @@
  * limitations under the License.
  */
 
-export class VivError extends Error {
-  constructor(message: string) {
-    super(message)
-    this.name = 'VivError'
-  }
-}
+import { Viv } from './client'
+export default Viv

@@ -1,0 +1,55 @@
+{
+  "name": "@yomo/viv-next",
+  "version": "0.1.0",
+  "description": "AI Agent Toolkit with fast and meaningful streaming response",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "build:watch": "tsup --watch",
+    "dev": "tsup --watch",
+    "clean": "rm -rf dist",
+    "lint": "eslint \"./**/*.ts*\"",
+    "check-types": "tsc --noEmit",
+    "prettier-check": "prettier --check \"./**/*.ts*\""
+  },
+  "keywords": ["agent", "llm", "streaming"],
+  "author": "Jiazong Hou <jiazong.hou@yomo.run>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vivgrid/viv.git"
+  },
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@eslint/js": "^9.21.0",
+    "@types/node": "22.13.9",
+    "@typescript-eslint/eslint-plugin": "^8.26.0",
+    "@typescript-eslint/parser": "^8.26.0",
+    "eslint": "^9.21.0",
+    "eslint-config-prettier": "^10.0.2",
+    "eslint-plugin-prettier": "^5.2.3",
+    "tsup": "^8.4.0",
+    "typescript": "5.8.2",
+    "typescript-eslint": "^8.26.0"
+  },
+  "peerDependencies": {
+    "next": "^15"
+  },
+  "bugs": {
+    "url": "https://github.com/vivgrid/viv/issues"
+  }
+}

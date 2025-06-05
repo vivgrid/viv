@@ -10,6 +10,6 @@
     "declaration": true,
     "lib": ["es2020", "esnext.asynciterable"]
   },
-  "include": ["src/**/*", "examples/**/*", "tests/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["."],
+  "exclude": ["*/dist", "dist", "node_modules"]
 }
