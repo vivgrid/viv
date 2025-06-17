@@ -18,24 +18,36 @@ import type { ClientOptions, CompletionResponse, RequestOptions } from './types'
 import { Stream } from './streaming'
 import { delay } from './core'
 import { validatePositiveInteger } from './core'
-import { VivError } from './error'
+import {
+  calculateRetryDelay,
+  createAPIError,
+  shouldRetryError,
+  VivAPIError,
+  VivError,
+} from './error'
 
 export class Viv {
   private apiKey: string
   private baseURL: string
   private maxRetries: number
   private retryDelay: number
+  private defaultHeaders: Record<string, string>
+  private defaultQuery: Record<string, string>
 
   constructor({
     apiKey,
     baseURL = 'https://api.vivgrid.com/v1',
     maxRetries = 3,
     retryDelay = 1000,
+    defaultHeaders = {},
+    defaultQuery = {},
   }: ClientOptions) {
     this.apiKey = apiKey
     this.baseURL = baseURL
     this.maxRetries = validatePositiveInteger('maxRetries', maxRetries)
     this.retryDelay = validatePositiveInteger('retryDelay', retryDelay)
+    this.defaultHeaders = defaultHeaders
+    this.defaultQuery = defaultQuery
   }
 
   /**
@@ -54,6 +66,13 @@ export class Viv {
        */
       stream: async (options: RequestOptions): Promise<Stream> => {
         const stream = new Stream()
+
+        if (options.signal) {
+          options.signal.addEventListener('abort', () => {
+            stream.abort()
+          })
+        }
+
         this.makeStreamRequest(options, stream).catch((error) => {
           stream.emit('error', error)
         })
@@ -74,27 +93,48 @@ export class Viv {
       const headers = {
         'Content-Type': 'application/json; charset=utf-8',
         Authorization: `Bearer ${this.apiKey}`,
+        ...this.defaultHeaders,
       }
-      const response = await fetch(`${this.baseURL}/chat/completions`, {
+      let url = `${this.baseURL}/chat/completions`
+      if (this.defaultQuery && Object.keys(this.defaultQuery).length > 0) {
+        url += `?${new URLSearchParams(this.defaultQuery)}`
+      }
+      const response = await fetch(url, {
         method: 'POST',
         headers,
         body: JSON.stringify(options),
+        signal: options.signal,
       })
       if (!response.ok) {
         const errorText = await response.text()
-        throw new VivError(
+        const error = new Error(
           `API request failed with status ${response.status}: ${errorText}`,
         )
+        throw createAPIError(error, response)
       }
       const result = await response.json()
       return result as CompletionResponse
     } catch (error) {
-      if (retryCount < this.maxRetries) {
-        const waitTime = this.retryDelay * Math.pow(2, retryCount)
-        await delay(waitTime)
-        return this.makeCreateRequest(options, retryCount + 1)
+      const { shouldRetry, errorType } = shouldRetryError(error)
+      if (!shouldRetry || retryCount >= this.maxRetries) {
+        if (error instanceof VivAPIError) {
+          throw error
+        }
+        throw createAPIError(error)
       }
-      throw error
+
+      const retryDelay = calculateRetryDelay(
+        this.retryDelay,
+        retryCount,
+        errorType,
+      )
+
+      console.warn(
+        `Request failed with ${errorType || 'unknown error'}, retrying in ${retryDelay}ms (attempt ${retryCount + 1}/${this.maxRetries})`,
+      )
+
+      await delay(retryDelay)
+      return this.makeCreateRequest(options, retryCount + 1)
     }
   }
   /**
@@ -106,13 +146,18 @@ export class Viv {
     retryCount = 0,
   ): Promise<void> {
     try {
-      const response = await fetch(`${this.baseURL}/chat/completions`, {
+      let url = `${this.baseURL}/chat/completions`
+      if (this.defaultQuery && Object.keys(this.defaultQuery).length > 0) {
+        url += `?${new URLSearchParams(this.defaultQuery)}`
+      }
+      const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json; charset=utf-8',
           Authorization: `Bearer ${this.apiKey}`,
           'X-Response-Format': 'vivgrid',
           Accept: 'text/event-stream',
+          ...this.defaultHeaders,
         },
         body: JSON.stringify({ ...options, stream: true }),
         signal: stream.signal,
@@ -120,9 +165,10 @@ export class Viv {
 
       if (!response.ok) {
         const errorText = await response.text()
-        throw new VivError(
+        const error = new Error(
           `API request failed with status ${response.status}: ${errorText}`,
         )
+        throw createAPIError(error, response)
       }
 
       if (!response.body) {
@@ -159,17 +205,27 @@ export class Viv {
         }
       }
     } catch (error) {
-      if (error instanceof Error && error.name === 'AbortError') {
+      const { shouldRetry, errorType } = shouldRetryError(error)
+
+      if (!shouldRetry || retryCount >= this.maxRetries) {
+        const apiError =
+          error instanceof VivAPIError ? error : createAPIError(error)
+        stream.emit('error', apiError)
         return
       }
 
-      if (retryCount < this.maxRetries) {
-        const waitTime = this.retryDelay * Math.pow(2, retryCount)
-        await delay(waitTime)
-        return this.makeStreamRequest(options, stream, retryCount + 1)
-      }
+      const retryDelay = calculateRetryDelay(
+        this.retryDelay,
+        retryCount,
+        errorType,
+      )
 
-      throw error
+      console.warn(
+        `Stream request failed with ${errorType || 'unknown error'}, retrying in ${retryDelay}ms (attempt ${retryCount + 1}/${this.maxRetries})`,
+      )
+
+      await delay(retryDelay)
+      return this.makeStreamRequest(options, stream, retryCount + 1)
     }
   }
 }

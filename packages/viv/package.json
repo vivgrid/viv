@@ -1,6 +1,6 @@
 {
   "name": "@yomo/viv",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "AI Agent Toolkit with fast and meaningful streaming response",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",

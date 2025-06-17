@@ -56,14 +56,6 @@ async function main() {
     console.log('content: ', content)
   })
 
-  stream.on('finish', (finish) => {
-    console.log('finish: ', finish)
-  })
-
-  stream.on('system', (system) => {
-    console.log('system: ', system)
-  })
-
   stream.on('usage', (usage) => {
     console.log('usage: ', usage)
   })
@@ -74,6 +66,10 @@ async function main() {
 
   stream.on('functionCallResult', (name, result) => {
     console.log('function_call_result: ', name, result)
+  })
+
+  stream.on('end', () => {
+    console.log('end')
   })
 
   stream.on('error', (error) => {

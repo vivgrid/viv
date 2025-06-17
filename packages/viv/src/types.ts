@@ -54,6 +54,7 @@ export type RequestOptions = {
   temperature?: number
   max_tokens?: number
   response_format?: ResponseFormat
+  signal?: AbortSignal
 }
 
 export type ClientOptions = {
@@ -61,6 +62,8 @@ export type ClientOptions = {
   baseURL?: string
   maxRetries?: number
   retryDelay?: number
+  defaultHeaders?: Record<string, string>
+  defaultQuery?: Record<string, string>
 }
 
 export type FunctionCallChunk = {

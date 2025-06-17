@@ -118,7 +118,6 @@ export class Stream
     if (!match) return
 
     try {
-      // const [prefix, data] = chunk.split(': ')
       const [, prefix, data] = match
       const rawPrefix = prefix as RawChunkPrefix
       const type = chunkPrefixToType[rawPrefix]

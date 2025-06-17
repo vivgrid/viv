@@ -13,7 +13,11 @@ export function Example() {
     if (clientRef.current) return
     clientRef.current = new Viv({
       apiKey: process.env.NEXT_PUBLIC_VIV_API_KEY!,
-      baseURL: '/api'
+      baseURL: '/api',
+      retryDelay: 1000,
+      maxRetries: 2,
+      defaultHeaders: { 'X-Test': 'test' },
+      defaultQuery: { 'test': '1' },
     })
   })
 
