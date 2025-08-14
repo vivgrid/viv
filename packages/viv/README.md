@@ -52,6 +52,10 @@ async function main() {
     console.log('reasoning: ', reasoning)
   })
 
+  stream.on('model', (model) => {
+    console.log('model: ', model)
+  })
+
   stream.on('content', (content) => {
     console.log('content: ', content)
   })

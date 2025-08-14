@@ -114,7 +114,7 @@ export class Stream
   }
   processChunk(chunk: string): void {
     if (!chunk.trim()) return
-    const match = chunk.match(/^([frcgup]):(.+)$/)
+    const match = chunk.match(/^([frmcgup]):(.+)$/)
     if (!match) return
 
     try {
@@ -142,6 +142,12 @@ export class Stream
             functionResult.name,
             functionResult.result,
           )
+          break
+        }
+        case 'model': {
+          const model = JSON.parse(data) as string
+          this.emit('chunk', type, model)
+          this.emit('model', model)
           break
         }
         case 'content': {

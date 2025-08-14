@@ -53,6 +53,7 @@ export type RequestOptions = {
   function_call?: 'auto' | 'none' | { name: string }
   temperature?: number
   max_tokens?: number
+  max_completion_tokens?: number
   response_format?: ResponseFormat
   signal?: AbortSignal
 }
@@ -96,11 +97,12 @@ export type TokenUsageChunk = {
   }
 }
 
-export type RawChunkPrefix = 'f' | 'r' | 'c' | 'g' | 'u' | 'p'
+export type RawChunkPrefix = 'f' | 'r' | 'm' | 'c' | 'g' | 'u' | 'p'
 
 export type ChunkType =
   | 'functionCall'
   | 'functionCallResult'
+  | 'model'
   | 'content'
   | 'reasoning'
   | 'usage'
@@ -109,6 +111,7 @@ export type ChunkType =
 export const chunkPrefixToType: Record<RawChunkPrefix, ChunkType> = {
   f: 'functionCall',
   r: 'functionCallResult',
+  m: 'model',
   c: 'content',
   g: 'reasoning',
   u: 'usage',
@@ -136,6 +139,7 @@ export type StreamEvents = {
   functionCall: (name: string, toolDescription: string) => void
   functionCallResult: (toolName: string, toolResult: string) => void
   reasoning: (delta: string) => void
+  model: (model: string) => void
   content: (delta: string) => void
   chunk: (type: ChunkType, data: unknown) => void
   end: () => void
