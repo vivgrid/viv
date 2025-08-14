@@ -106,11 +106,23 @@ export class Viv {
         signal: options.signal,
       })
       if (!response.ok) {
-        const errorText = await response.text()
+        let errorText
+        try {
+          const errorJSON = (await response.json()) as {
+            error: {
+              code: string
+              message: string
+            }
+          }
+          errorText = errorJSON?.error?.message
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (error) {
+          errorText = await response.text()
+        }
         const error = new Error(
           `API request failed with status ${response.status}: ${errorText}`,
         )
-        throw createAPIError(error, response)
+        throw createAPIError(error)
       }
       const result = await response.json()
       return result as CompletionResponse
@@ -164,11 +176,23 @@ export class Viv {
       })
 
       if (!response.ok) {
-        const errorText = await response.text()
+        let errorText
+        try {
+          const errorJSON = (await response.json()) as {
+            error: {
+              code: string
+              message: string
+            }
+          }
+          errorText = errorJSON?.error?.message
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (error) {
+          errorText = await response.text()
+        }
         const error = new Error(
           `API request failed with status ${response.status}: ${errorText}`,
         )
-        throw createAPIError(error, response)
+        throw createAPIError(error)
       }
 
       if (!response.body) {
