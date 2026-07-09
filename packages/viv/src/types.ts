@@ -55,6 +55,7 @@ export type RequestOptions = {
   max_tokens?: number
   max_completion_tokens?: number
   response_format?: ResponseFormat
+  extra_body?: Record<string, unknown>
   signal?: AbortSignal
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   agent_context?: Record<string, any>

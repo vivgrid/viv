@@ -102,7 +102,10 @@ export class Viv {
       const response = await fetch(url, {
         method: 'POST',
         headers,
-        body: JSON.stringify(options),
+        body: JSON.stringify({
+          ...options,
+          ...(options.extra_body ?? {}),
+        }),
         signal: options.signal,
       })
       if (!response.ok) {
@@ -171,7 +174,11 @@ export class Viv {
           Accept: 'text/event-stream',
           ...this.defaultHeaders,
         },
-        body: JSON.stringify({ ...options, stream: true }),
+        body: JSON.stringify({
+          ...options,
+          ...(options.extra_body ?? {}),
+          stream: true,
+        }),
         signal: stream.signal,
       })
 
